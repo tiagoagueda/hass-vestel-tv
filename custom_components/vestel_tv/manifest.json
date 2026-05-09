@@ -1,0 +1,13 @@
+{
+  "domain": "vestel_tv",
+  "name": "Vestel TV",
+  "version": "0.1.0",
+  "documentation": "https://source.tiagoagueda.com/tiagoagueda/hass-vestel-tv",
+  "issue_tracker": "https://source.tiagoagueda.com/tiagoagueda/hass-vestel-tv/issues",
+  "codeowners": ["@tiagoagueda"],
+  "config_flow": true,
+  "iot_class": "local_polling",
+  "integration_type": "device",
+  "requirements": ["websockets>=11.0"],
+  "dependencies": []
+}

@@ -1,0 +1,8 @@
+# Enforce LF line endings everywhere (cross-platform consistency)
+* text=auto eol=lf
+
+*.py   text eol=lf diff=python
+*.json text eol=lf
+*.md   text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
