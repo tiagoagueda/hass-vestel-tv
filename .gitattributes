@@ -1,8 +1,6 @@
-# Enforce LF line endings everywhere (cross-platform consistency)
+# Normalize all text files to LF in the repository and in the working tree,
+# regardless of the contributor's core.autocrlf setting.
 * text=auto eol=lf
 
-*.py   text eol=lf diff=python
-*.json text eol=lf
-*.md   text eol=lf
-*.yaml text eol=lf
-*.yml  text eol=lf
+# Binary assets must never be touched.
+*.png binary

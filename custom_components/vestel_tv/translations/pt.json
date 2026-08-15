@@ -1,0 +1,25 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vestel TV",
+        "description": "Active o \"Controlo Remoto Virtual\" no menu de definições da TV antes de continuar.",
+        "data": {
+          "host": "Endereço IP",
+          "name": "Nome"
+        },
+        "data_description": {
+          "host": "O endereço IP da TV. Reserve-lhe um IP fixo no router para que não mude.",
+          "name": "Nome apresentado para esta TV no Home Assistant."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Falha na ligação",
+      "unknown": "Erro inesperado"
+    },
+    "abort": {
+      "already_configured": "O dispositivo já está configurado"
+    }
+  }
+}

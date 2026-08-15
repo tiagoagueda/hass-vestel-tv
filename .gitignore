@@ -1,10 +1,13 @@
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-*.egg-info/
-.venv/
-venv/
-.env
-.idea/
+
+# Editors / IDEs
 .vscode/
-*.log
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

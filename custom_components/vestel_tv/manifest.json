@@ -1,13 +1,15 @@
 {
   "domain": "vestel_tv",
   "name": "Vestel TV",
-  "version": "0.1.0",
-  "documentation": "https://source.tiagoagueda.com/tiagoagueda/hass-vestel-tv",
-  "issue_tracker": "https://source.tiagoagueda.com/tiagoagueda/hass-vestel-tv/issues",
+  "integration_type": "device",
   "codeowners": ["@tiagoagueda"],
   "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/tiagoagueda/hass-vestel-tv",
+  "homeassistant": "2024.4.0",
   "iot_class": "local_polling",
-  "integration_type": "device",
-  "requirements": ["websockets>=11.0"],
-  "dependencies": []
+  "issue_tracker": "https://github.com/tiagoagueda/hass-vestel-tv/issues",
+  "loggers": ["custom_components.vestel_tv"],
+  "requirements": [],
+  "version": "0.2.0"
 }

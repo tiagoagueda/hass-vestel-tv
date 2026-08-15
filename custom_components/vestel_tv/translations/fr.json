@@ -1,0 +1,25 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vestel TV",
+        "description": "Activez la « télécommande virtuelle » dans le menu des réglages du téléviseur avant de continuer.",
+        "data": {
+          "host": "Hôte",
+          "name": "Nom"
+        },
+        "data_description": {
+          "host": "L'adresse IP du téléviseur. Réservez-lui une adresse fixe sur votre routeur pour qu'elle ne change pas.",
+          "name": "Nom affiché pour ce téléviseur dans Home Assistant."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Échec de connexion",
+      "unknown": "Erreur inattendue"
+    },
+    "abort": {
+      "already_configured": "L'appareil est déjà configuré"
+    }
+  }
+}
