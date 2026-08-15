@@ -1,5 +1,6 @@
 {
   "config": {
+    "flow_title": "{name}",
     "step": {
       "user": {
         "title": "Vestel TV",
@@ -9,17 +10,23 @@
           "name": "Nom"
         },
         "data_description": {
-          "host": "L'adresse IP du téléviseur. Réservez-lui une adresse fixe sur votre routeur pour qu'elle ne change pas.",
+          "host": "L'adresse IP du téléviseur. Le téléviseur doit être allumé pour pouvoir être vérifié.",
           "name": "Nom affiché pour ce téléviseur dans Home Assistant."
         }
+      },
+      "discovery_confirm": {
+        "title": "Vestel TV",
+        "description": "Voulez-vous ajouter {name} ({model}) à l'adresse {host} à Home Assistant ?"
       }
     },
     "error": {
       "cannot_connect": "Échec de connexion",
+      "not_vestel": "Cet appareil a répondu, mais ce n'est pas un téléviseur Vestel.",
       "unknown": "Erreur inattendue"
     },
     "abort": {
-      "already_configured": "L'appareil est déjà configuré"
+      "already_configured": "L'appareil est déjà configuré",
+      "not_vestel": "Cet appareil n'est pas un téléviseur Vestel."
     }
   }
 }

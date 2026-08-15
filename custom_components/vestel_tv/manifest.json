@@ -7,9 +7,13 @@
   "dependencies": [],
   "documentation": "https://github.com/tiagoagueda/hass-vestel-tv",
   "homeassistant": "2024.4.0",
-  "iot_class": "local_polling",
+  "iot_class": "local_push",
   "issue_tracker": "https://github.com/tiagoagueda/hass-vestel-tv/issues",
   "loggers": ["custom_components.vestel_tv"],
   "requirements": [],
-  "version": "0.2.0"
+  "ssdp": [
+    { "st": "urn:dial-multiscreen-org:service:dial:1" },
+    { "deviceType": "urn:schemas-upnp-org:device:tvdevice:1" }
+  ],
+  "version": "0.4.0"
 }

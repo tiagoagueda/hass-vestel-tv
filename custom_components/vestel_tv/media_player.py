@@ -15,7 +15,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import VestelTV
-from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
+from .const import CONF_SOURCES, DEFAULT_SCAN_INTERVAL, DEFAULT_SOURCES, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -49,6 +49,10 @@ class VestelTVMediaPlayer(MediaPlayerEntity):
 
     def __init__(self, tv: VestelTV, entry: ConfigEntry) -> None:
         self._tv = tv
+        self._sources: list[str] = list(
+            entry.options.get(CONF_SOURCES, entry.data.get(CONF_SOURCES))
+            or DEFAULT_SOURCES
+        )
         self._attr_unique_id = entry.entry_id
         self._attr_device_info = {
             "identifiers": {(DOMAIN, entry.entry_id)},
@@ -66,12 +70,20 @@ class VestelTVMediaPlayer(MediaPlayerEntity):
         return self._tv.muted
 
     @property
-    def volume_level(self) -> float:
+    def volume_level(self) -> float | None:
+        # The TV reports no readable volume level over this protocol, only
+        # relative steps, so leave it unknown rather than inventing a number.
+        if self._tv.volume is None:
+            return None
         return self._tv.volume / 100
 
     @property
     def source(self) -> str | None:
         return self._tv.source if self._tv.state else None
+
+    @property
+    def source_list(self) -> list[str]:
+        return self._sources
 
     async def async_update(self) -> None:
         await self._tv.async_update()
@@ -92,9 +104,20 @@ class VestelTVMediaPlayer(MediaPlayerEntity):
         await self._tv.async_toggle_mute()
 
     async def async_select_source(self, source: str) -> None:
-        # Vestel has no direct-select API; cycle until source matches.
+        # Vestel has no direct-select API; the source key cycles the input.
+        if self._tv.source is None:
+            # Without a readable current source there is nothing to compare
+            # against, so cycling would fire the key blindly. Step once.
+            _LOGGER.debug(
+                "Current source unknown; sending a single source step instead "
+                "of cycling towards %s",
+                source,
+            )
+            await self._tv.async_select_source_step()
+            return
         for _ in range(10):
             if self._tv.source == source:
                 return
             await self._tv.async_select_source_step()
             await self._tv.async_update()
+        _LOGGER.warning("Gave up cycling to source %s", source)

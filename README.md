@@ -18,9 +18,9 @@ The integration is **self-contained**: the `pyvesteltv` protocol logic is vendor
 nothing extra to install from PyPI.
 
 > [!WARNING]
-> **v0.2.0 is an untested scaffold.** The code is complete but has not yet been verified
-> against a live TV. Expect rough edges and please report what you find — see
-> [Status](#status).
+> **v0.3.0 has been verified against exactly one TV** — a Vestel_MB211 (software
+> 3.33.21.0, sold as ESSENTIELB). Discovery, key codes and state all work there. Whether
+> older Vestel chassis speak the same protocol is untested — see [Status](#status).
 
 ## Features
 
@@ -49,10 +49,14 @@ Medion** and **Finlux**. The upstream project was developed against a Procaster 
 
 - Home Assistant **2024.4.0** or newer.
 - A Vestel-based TV on the same network/VLAN as Home Assistant, reachable on TCP ports
-  **1986** and **7681**, and able to receive SSDP multicast on UDP **1900**.
-- **Virtual Remote enabled on the TV** — without it the TV ignores every command. Enable
-  it in the TV's settings menu before adding the integration.
-- A static IP (or DHCP reservation) for the TV, since the config entry is keyed by address.
+  **56789** (commands) and **7681** (state), and able to receive SSDP multicast on
+  UDP **1900**.
+- **Virtual Remote enabled on the TV** — enable it in the TV's settings menu before adding
+  the integration. Note that on MB211-era firmware this setting does *not* open the legacy
+  TCP port 1986; that port is simply absent regardless.
+- A static IP is **no longer required** — config entries are keyed by the TV's MAC address,
+  so a changed DHCP lease is still recognised as the same TV. Sets that do not publish a
+  MAC in their `dd.xml` fall back to being keyed by address.
 
 > [!NOTE]
 > The Vestel icon and logo shipped in
@@ -86,22 +90,39 @@ Configuration is done entirely in the UI; there is nothing to add to `configurat
 
 [![Open your Home Assistant instance and start setting up a new integration.][config-flow-shield]][config-flow]
 
-**Settings → Devices & Services → + Add Integration → Vestel TV**, then enter the TV's IP
-address and, optionally, a name.
+Switched-on Vestel TVs are discovered automatically and appear under
+**Settings → Devices & Services** waiting to be confirmed — no address needed.
 
-Everything else uses the defaults baked into the stock Vestel protocol — TCP 1986,
-WebSocket 7681, SSDP/DIAL discovery on 1900. Each TV becomes one device with a single
-`media_player` entity.
+To add one by hand, or if discovery does not find it:
+**Settings → Devices & Services → + Add Integration → Vestel TV**, then enter the TV's IP
+address and, optionally, a name. The TV must be switched on, since the flow checks it
+answers and is actually a Vestel before creating the entry.
+
+Everything else uses the defaults baked into the stock Vestel protocol — commands on the
+DIAL port 56789, state on WebSocket 7681, SSDP/DIAL discovery on 1900. Each TV becomes one
+device with a single `media_player` entity.
 
 ## Protocol notes
 
 The TV exposes three concurrent interfaces:
 
-| Channel                | Port           | Purpose                                                   |
-| ---------------------- | -------------- | --------------------------------------------------------- |
-| HTTP POST `/vr/remote` | dynamic (DIAL) | Send key codes as an XML body                             |
-| TCP socket             | 1986           | State queries (`GETMUTE`, `GETSOURCE`, `GETPROGRAM`, …)   |
-| WebSocket `ws://host/` | 7681           | State broadcasts — *not yet consumed by this integration* |
+| Channel                       | Port         | Purpose                                       |
+| ----------------------------- | ------------ | --------------------------------------------- |
+| HTTP POST `/apps/SmartCenter` | 56789 (DIAL) | Key codes, text entry, queries, app launching |
+| WebSocket `ws://host:7681/`   | 7681         | State broadcasts — channel list, `tv_state`   |
+
+Commands are XML bodies POSTed with an `application_name: tv smart centre` header; the TV
+answers `201 Created`. Replies to queries never come back in the POST body — they arrive
+on the WebSocket, so the client keeps that socket open.
+
+> [!IMPORTANT]
+> The WebSocket handshake **must** carry an `Origin: http://<tv-ip>` header. Without it the
+> connection is accepted and then stays silent indefinitely, with no error.
+
+This is not the protocol `pyvesteltv` implements. On MB211-era firmware the older channels
+— key codes to `vr/remote`, state over TCP 1986 — are gone entirely: `vr/remote` returns
+404 on every path, and 1986 appears nowhere in a sweep of all 65535 ports, with the TV on
+and Virtual Remote enabled.
 
 Two consequences worth knowing before you file a bug:
 
@@ -113,13 +134,25 @@ Two consequences worth knowing before you file a bug:
 
 ## Status
 
-**v0.2.0 — feature-complete scaffold, unverified against real hardware.** Power, volume,
-mute and source cycling are implemented but have not been confirmed on a live TV. Reports
-from any Vestel-based set — working or not — are very welcome on the
-[issue tracker][issues]; please include your TV's brand and model and debug logs.
+**v0.3.0 — verified against one TV.** On a Vestel_MB211 (software 3.33.21.0, ESSENTIELB),
+these are confirmed working on real hardware: SSDP discovery, the WebSocket state channel,
+the parsed channel list, and key codes — volume up/down were observed changing the TV.
 
-Not yet implemented: Wake-on-LAN power-on, WebSocket push updates, media title/program
-attributes, and a configurable source list.
+Confirmed *not* available on that firmware, and so unsupported here: reading the current
+volume level or mute state. The protocol exposes only relative volume steps, so
+`volume_level` reports unknown rather than a made-up number.
+
+Untested and unverified: power on/off, mute, source cycling, text entry and app launching.
+They are implemented against the captured protocol and the TV accepts them, but their
+effect has not been confirmed. Older Vestel chassis may still use the legacy `vr/remote`
+and TCP 1986 channels this version removed — if your set stopped working at 0.3.0, that
+is the likely cause and worth an issue.
+
+Reports from any Vestel-based set — working or not — are very welcome on the
+[issue tracker][issues]; please include your TV's brand, model, `tv_version` and debug logs.
+
+Not yet implemented: Wake-on-LAN power-on, media title/program attributes, and exposing
+the TV's channel list as the source list.
 
 ## Troubleshooting
 
@@ -130,7 +163,8 @@ attributes, and a configurable source list.
   physical remote leaves the network and cannot answer.
 - Check that Home Assistant and the TV are on the same subnet. SSDP discovery uses
   multicast, which most routers do not forward across VLANs.
-- From the HA host, verify the state port answers: `nc -vz <tv-ip> 1986`.
+- From the HA host, verify both ports answer: `nc -vz <tv-ip> 56789` and
+  `nc -vz <tv-ip> 7681`.
 
 ### Commands are ignored
 

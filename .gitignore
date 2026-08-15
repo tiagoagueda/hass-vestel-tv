@@ -11,3 +11,11 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# Protocol-research scratch: third-party APKs pulled apart to inspect the wire
+# format. Never commit these — redistributing them is not ours to do.
+*.apk
+*.xapk
+*.pcap
+*.pcapng
+
