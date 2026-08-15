@@ -72,15 +72,11 @@
       },
       "subtitle": {
         "name": "Legendas"
-      },
-      "channel_up": {
-        "name": "Canal seguinte"
-      },
-      "channel_down": {
-        "name": "Canal anterior"
-      },
-      "source": {
-        "name": "Fonte"
+      }
+    },
+    "remote": {
+      "remote": {
+        "name": "Comando"
       }
     }
   }

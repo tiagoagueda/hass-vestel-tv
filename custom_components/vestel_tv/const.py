@@ -103,7 +103,59 @@ KEY_SETTINGS = 1067
 
 KEYS_DIGIT = {str(i): 1000 + i for i in range(10)}
 
-# Buttons exposed as their own entities: (key suffix, translation key, code).
+# Every key the remote entity accepts by name, for remote.send_command.
+REMOTE_COMMANDS: dict[str, int] = {
+    "power": KEY_POWER,
+    "mute": KEY_MUTE,
+    "volume_up": KEY_VOL_UP,
+    "volume_down": KEY_VOL_DOWN,
+    "source": KEY_SOURCE,
+    "back": KEY_BACK,
+    "exit": KEY_EXIT,
+    "menu": KEY_MENU,
+    "quick_menu": KEY_QUICK_MENU,
+    "apps": KEY_APP,
+    "ok": KEY_OK,
+    "up": KEY_UP,
+    "down": KEY_DOWN,
+    "left": KEY_LEFT,
+    "right": KEY_RIGHT,
+    "info": KEY_INFO,
+    "epg": KEY_EPG,
+    "text": KEY_TEXT,
+    "text2": KEY_TEXT2,
+    "subtitle": KEY_SUBTITLE,
+    "language": KEY_LANGUAGE,
+    "aspect_ratio": KEY_ASPECT_RATIO,
+    "favorites": KEY_FAVORITES,
+    "sleep_timer": KEY_SLEEP_TIMER,
+    "channel_up": KEY_PROG_UP,
+    "channel_down": KEY_PROG_DOWN,
+    "channel_previous": KEY_PROG_PREVIOUS,
+    "play": KEY_PLAY,
+    "pause": KEY_PAUSE,
+    "stop": KEY_STOP,
+    "record": KEY_RECORD,
+    "rewind": KEY_REWIND,
+    "forward": KEY_FORWARD,
+    "red": KEY_RED,
+    "green": KEY_GREEN,
+    "yellow": KEY_YELLOW,
+    "blue": KEY_BLUE,
+    "netflix": KEY_NETFLIX,
+    "web_browser": KEY_WEB_BROWSER,
+    "media_browser": KEY_MEDIA_BROWSER,
+    "recordings": KEY_RECORDINGS,
+    "settings": KEY_SETTINGS,
+    **{digit: code for digit, code in KEYS_DIGIT.items()},
+}
+
+# Prefix that types a string rather than sending a key, e.g. "text:hello".
+REMOTE_TEXT_PREFIX = "text:"
+
+# Keys given their own button entity. Deliberately excludes anything the media
+# player already exposes -- source, channel up/down and the transport keys --
+# so the same key is not wired up twice under two different names.
 REMOTE_BUTTONS: tuple[tuple[str, int], ...] = (
     ("up", KEY_UP),
     ("down", KEY_DOWN),
@@ -119,7 +171,4 @@ REMOTE_BUTTONS: tuple[tuple[str, int], ...] = (
     ("epg", KEY_EPG),
     ("text", KEY_TEXT),
     ("subtitle", KEY_SUBTITLE),
-    ("channel_up", KEY_PROG_UP),
-    ("channel_down", KEY_PROG_DOWN),
-    ("source", KEY_SOURCE),
 )

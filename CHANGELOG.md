@@ -10,6 +10,40 @@ that is what HACS reads to offer an update.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-15
+
+### Added
+
+- **A `remote` entity.** `remote.send_command` reaches **52 named keys** —
+  navigation, colour keys, transport, teletext, favourites, app keys and the
+  digits — plus any raw numeric code, and `text:some words` to type a string.
+  It accepts sequences, `num_repeats` and `delay_secs`, so a whole menu journey
+  is one call:
+
+  ```yaml
+  action: remote.send_command
+  target: { entity_id: remote.essentielb }
+  data: { command: [menu, down, down, ok] }
+  ```
+
+  This is where Home Assistant expects TV navigation to live — the
+  `media_player` domain has no feature flag for a D-pad, menu or colour keys,
+  so those genuinely cannot be put on that entity by any integration.
+- **Channel browsing in the media player card** (`BROWSE_MEDIA`). The TV's own
+  channel list is offered as `1. TF1`, `2. France 2` …; picking one tunes it by
+  typing the digits. Channel *numbers* are now parsed from `<active_list>`
+  alongside the names.
+
+### Changed
+
+- **The buttons that duplicated the media player are gone.** `source`,
+  `channel_up` and `channel_down` sent exactly the keys `SELECT_SOURCE`,
+  `NEXT_TRACK` and `PREVIOUS_TRACK` already send, so the same key was wired up
+  twice under two names. Fourteen navigation buttons remain.
+- **Those fourteen buttons are now disabled by default.** The remote entity
+  reaches every one of them, so they are no longer clutter on the device page —
+  enable individually whichever you want to put on a dashboard.
+
 ## [0.5.0] - 2026-08-15
 
 ### Added
@@ -184,7 +218,8 @@ is forked from [T3m3z/HA-Vestel-Component](https://github.com/T3m3z/HA-Vestel-Co
 and [T3m3z/pyvesteltv](https://github.com/T3m3z/pyvesteltv), which carry the per-commit
 history of the original component and protocol library.
 
-[unreleased]: https://github.com/tiagoagueda/hass-vestel-tv/compare/v0.5.0...HEAD
+[unreleased]: https://github.com/tiagoagueda/hass-vestel-tv/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/tiagoagueda/hass-vestel-tv/releases/tag/v0.6.0
 [0.5.0]: https://github.com/tiagoagueda/hass-vestel-tv/releases/tag/v0.5.0
 [0.4.0]: https://github.com/tiagoagueda/hass-vestel-tv/releases/tag/v0.4.0
 [0.3.0]: https://github.com/tiagoagueda/hass-vestel-tv/releases/tag/v0.3.0

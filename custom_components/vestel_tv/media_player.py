@@ -6,6 +6,8 @@ from datetime import timedelta
 from typing import Any
 
 from homeassistant.components.media_player import (
+    BrowseMedia,
+    MediaClass,
     MediaPlayerDeviceClass,
     MediaPlayerEntity,
     MediaPlayerEntityFeature,
@@ -18,6 +20,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import VestelRuntime
 from .const import (
+    COMMAND_CHANNEL_LIST,
     CONF_SOURCES,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_SOURCES,
@@ -47,6 +50,7 @@ SUPPORT_FLAGS = (
     | MediaPlayerEntityFeature.NEXT_TRACK
     | MediaPlayerEntityFeature.PREVIOUS_TRACK
     | MediaPlayerEntityFeature.PLAY_MEDIA
+    | MediaPlayerEntityFeature.BROWSE_MEDIA
 )
 
 
@@ -123,7 +127,7 @@ class VestelTVMediaPlayer(VestelEntity, MediaPlayerEntity):
         }
         if self._tv.channels:
             attributes["channel_count"] = len(self._tv.channels)
-            attributes["channels"] = self._tv.channels
+            attributes["channels"] = [channel.name for channel in self._tv.channels]
         if (description := self._description) is not None:
             if description.brand:
                 attributes["brand"] = description.brand
@@ -200,6 +204,42 @@ class VestelTVMediaPlayer(VestelEntity, MediaPlayerEntity):
 
         _LOGGER.error(
             "Unsupported media type %r; use 'channel' or 'url'", media_type
+        )
+
+    async def async_browse_media(
+        self,
+        media_content_type: str | None = None,
+        media_content_id: str | None = None,
+    ) -> BrowseMedia:
+        """Offer the TV's own channel list to pick from.
+
+        The list arrives over the WebSocket, so it is only populated once the
+        TV has broadcast it; ask for it if we have nothing yet.
+        """
+        if not self._tv.channels:
+            await self._tv.async_send_command(COMMAND_CHANNEL_LIST)
+
+        children = [
+            BrowseMedia(
+                media_class=MediaClass.CHANNEL,
+                media_content_type=MediaType.CHANNEL,
+                media_content_id=str(channel.number),
+                title=f"{channel.number}. {channel.name}",
+                can_play=True,
+                can_expand=False,
+            )
+            for channel in self._tv.channels
+        ]
+
+        return BrowseMedia(
+            media_class=MediaClass.DIRECTORY,
+            media_content_type=MediaType.CHANNELS,
+            media_content_id="channels",
+            title="Channels",
+            can_play=False,
+            can_expand=True,
+            children=children,
+            children_media_class=MediaClass.CHANNEL,
         )
 
     async def async_select_source(self, source: str) -> None:

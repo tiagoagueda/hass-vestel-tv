@@ -25,10 +25,11 @@ nothing extra to install from PyPI.
 
 ## Features
 
-| Platform       | Description                                                                                            |
-| -------------- | ------------------------------------------------------------------------------------------------------ |
-| `media_player` | Power, volume step, mute, source, play/pause/stop, channel up/down, tuning a channel or opening a URL. |
-| `button`       | 17 remote keys — D-pad and OK, Back, Exit, Menu, Quick menu, Apps, Info, TV guide, Teletext, Subtitles |
+| Platform       | Description                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| `media_player` | Power, volume step, mute, source, play/pause/stop, channel up/down, browsing the channel list. |
+| `remote`       | `remote.send_command` for all 52 named keys, raw key codes, and typing text.                   |
+| `button`       | 14 navigation keys as one-tap buttons. Disabled by default — enable the ones you want.         |
 
 - **Local push** — the TV's state arrives over a WebSocket it keeps open, rather than
   being polled; commands go out immediately as key codes.
@@ -109,7 +110,25 @@ answers and is actually a Vestel before creating the entry.
 
 Everything else uses the defaults baked into the stock Vestel protocol — commands on the
 DIAL port 56789, state on WebSocket 7681, SSDP/DIAL discovery on 1900. Each TV becomes one
-device with a `media_player` entity and 17 remote-key `button` entities.
+device with a `media_player` entity, a `remote` entity, and 14 navigation `button`
+entities that are disabled by default.
+
+### Sending remote keys
+
+Navigation keys live on the `remote` entity, because Home Assistant's `media_player`
+domain has no feature for a D-pad, menu or colour keys — no integration can add those to a
+media player. Sequences, repeats and delays all work:
+
+```yaml
+action: remote.send_command
+target: { entity_id: remote.essentielb }
+data:
+  command: [menu, down, down, ok]
+  delay_secs: 0.4
+```
+
+Anything not named is still reachable by raw key code (`command: ["1064"]`), and
+`text:hello` types a string one character at a time.
 
 ## Protocol notes
 
@@ -143,10 +162,13 @@ Two consequences worth knowing before you file a bug:
 
 ## Status
 
-**v0.5.0 — verified against one TV.** On a Vestel_MB211 (software 3.33.21.0, ESSENTIELB),
+**v0.6.0 — verified against one TV.** On a Vestel_MB211 (software 3.33.21.0, ESSENTIELB),
 these are confirmed working on real hardware: SSDP discovery, the WebSocket state channel,
-the parsed channel list, key codes — volume up/down were observed changing the TV — and
-setting the integration up end to end in Home Assistant.
+the parsed channel list with numbers, key codes — volume up/down were observed changing the
+TV — device grouping by MAC, and setting the integration up end to end in Home Assistant.
+
+**Power on/off is implemented but unverified.** `KEY_POWER` is a toggle and the TV accepts
+it, but its effect has not been confirmed on real hardware.
 
 Key codes 1012/1013/1016/1017 and the digits are confirmed on that TV, and 1010 (back) and
 1037 (exit) were captured from Vestel's own app. The remaining button codes come from

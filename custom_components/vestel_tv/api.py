@@ -67,6 +67,14 @@ _SSDP_MSEARCH = (
 
 
 @dataclass(frozen=True)
+class VestelChannel:
+    """One tuned channel from an ``<active_list>`` broadcast."""
+
+    number: int
+    name: str
+
+
+@dataclass(frozen=True)
 class VestelDescription:
     """Parsed DIAL device description (``dd.xml``) for one TV."""
 
@@ -343,7 +351,7 @@ class VestelTV:
         self.volume: int | None = None
         self.source: str | None = None
         self.program: str | None = None
-        self.channels: list[str] = []
+        self.channels: list[VestelChannel] = []
         self.last_ws_message: str = ""
 
     @property
@@ -559,19 +567,25 @@ class VestelTV:
             return
 
     def _parse_channel_list(self, message: str) -> None:
-        """Pull channel names out of an <active_list> frame."""
+        """Pull channels out of an <active_list> frame.
+
+        ``rsn`` is the number shown on the TV and the one the digit keys tune,
+        so it is kept alongside the name.
+        """
         try:
             root = ElementTree.fromstring(message)
         except ElementTree.ParseError as err:
             _LOGGER.debug("Could not parse channel list: %s", err)
             return
-        names = [
-            name
-            for service in root.iter("service")
-            if (name := service.get("name"))
-        ]
-        if names:
-            self.channels = names
+        channels: list[VestelChannel] = []
+        for service in root.iter("service"):
+            name = service.get("name")
+            number = service.get("rsn")
+            if not name or not number or not number.isdigit():
+                continue
+            channels.append(VestelChannel(number=int(number), name=name))
+        if channels:
+            self.channels = channels
 
     @staticmethod
     def _attr(message: str, attribute: str) -> str | None:

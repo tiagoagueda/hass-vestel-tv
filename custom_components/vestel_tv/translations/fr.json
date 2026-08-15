@@ -72,15 +72,11 @@
       },
       "subtitle": {
         "name": "Sous-titres"
-      },
-      "channel_up": {
-        "name": "Chaîne suivante"
-      },
-      "channel_down": {
-        "name": "Chaîne précédente"
-      },
-      "source": {
-        "name": "Source"
+      }
+    },
+    "remote": {
+      "remote": {
+        "name": "Télécommande"
       }
     }
   }

@@ -33,7 +33,14 @@ async def async_setup_entry(
 
 
 class VestelTVButton(VestelEntity, ButtonEntity):
-    """A single remote key, exposed as a button."""
+    """A single remote key, exposed as a button.
+
+    Disabled by default: `remote.send_command` reaches every key including
+    these, so fourteen always-on entities would be clutter for most setups.
+    Enable the handful you want to put on a dashboard.
+    """
+
+    _attr_entity_registry_enabled_default = False
 
     def __init__(self, tv, entry, description, key: str, code: int) -> None:
         super().__init__(tv, entry, description)

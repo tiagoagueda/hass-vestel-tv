@@ -72,15 +72,11 @@
       },
       "subtitle": {
         "name": "Subtitles"
-      },
-      "channel_up": {
-        "name": "Channel up"
-      },
-      "channel_down": {
-        "name": "Channel down"
-      },
-      "source": {
-        "name": "Source"
+      }
+    },
+    "remote": {
+      "remote": {
+        "name": "Remote"
       }
     }
   }
