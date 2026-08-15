@@ -17,9 +17,13 @@ that is what HACS reads to offer an update.
 - Config-flow UI strings (`strings.json`) with English (`en`), French (`fr`) and
   Portuguese (`pt`) translations. The flow previously fell back to raw key names.
 - `CHANGELOG.md`, `CONTRIBUTING.md` and `CLAUDE.md`.
-- Brand assets under `images/` (`icon`/`logo`, 1× and 2×), rendered from the official
-  Vestel wordmark on [vestelinternational.com](https://vestelinternational.com/), and a
-  trademark notice in the README covering their use.
+- Integration artwork in `custom_components/vestel_tv/brand/` (`icon`/`logo`, 1× and 2×),
+  rendered from the official Vestel wordmark on
+  [vestelinternational.com](https://vestelinternational.com/) to the
+  [brands spec](https://github.com/home-assistant/brands#image-specification), plus a
+  trademark notice in the README covering their use. Home Assistant **2026.3+** serves
+  these in place of the "icon not available" placeholder it showed before, since
+  `vestel_tv` has no entry on the brands CDN.
 
 ### Changed
 

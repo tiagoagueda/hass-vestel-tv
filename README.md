@@ -54,6 +54,14 @@ Medion** and **Finlux**. The upstream project was developed against a Procaster 
   it in the TV's settings menu before adding the integration.
 - A static IP (or DHCP reservation) for the TV, since the config entry is keyed by address.
 
+> [!NOTE]
+> The Vestel icon and logo shipped in
+> [`custom_components/vestel_tv/brand/`](custom_components/vestel_tv/brand/) are only
+> picked up by Home Assistant **2026.3 or newer**, which added support for custom
+> integrations serving their own brand images. On older versions the integration works
+> exactly the same, but its card shows Home Assistant's generic "icon not available"
+> placeholder, because `vestel_tv` has no entry on the brands CDN.
+
 ## Installation
 
 ### HACS (recommended)
@@ -159,11 +167,11 @@ This is a modernized fork of [@T3m3z](https://github.com/T3m3z)'s
 [pyvesteltv](https://github.com/T3m3z/pyvesteltv) protocol library vendored into the
 integration. All of the reverse-engineering credit belongs there.
 
-The wordmark in [`images/`](images/) is Vestel's own, taken from
-[vestelinternational.com](https://vestelinternational.com/) and used only to identify the
-hardware this integration talks to. "Vestel" is a trademark of Vestel Elektronik Sanayi ve
-Ticaret A.Ş.; this is an unofficial community project with no affiliation to or
-endorsement by Vestel.
+The wordmark in [`custom_components/vestel_tv/brand/`](custom_components/vestel_tv/brand/)
+is Vestel's own, taken from [vestelinternational.com](https://vestelinternational.com/)
+and used only to identify the hardware this integration talks to. "Vestel" is a trademark
+of Vestel Elektronik Sanayi ve Ticaret A.Ş.; this is an unofficial community project with
+no affiliation to or endorsement by Vestel.
 
 ## License
 
@@ -187,4 +195,4 @@ MIT — see [LICENSE](LICENSE).
 [releases-shield]: https://img.shields.io/github/release/tiagoagueda/hass-vestel-tv.svg?style=for-the-badge
 [releases]: https://github.com/tiagoagueda/hass-vestel-tv/releases
 [user_profile]: https://github.com/tiagoagueda
-[vestelimg]: images/logo.png
+[vestelimg]: custom_components/vestel_tv/brand/logo.png

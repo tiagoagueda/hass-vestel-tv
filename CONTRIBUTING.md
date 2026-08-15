@@ -41,6 +41,7 @@ no linters, no CI. Home Assistant loads the files as they are.
 ```text
 custom_components/vestel_tv/               # the integration (HA-facing code)
 custom_components/vestel_tv/api.py         # vendored TV protocol client
+custom_components/vestel_tv/brand/         # icon/logo shown by HA and the README
 custom_components/vestel_tv/translations/  # config-flow translations
 hacs.json                                  # HACS metadata
 ```
