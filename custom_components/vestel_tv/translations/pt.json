@@ -28,5 +28,60 @@
       "already_configured": "O dispositivo já está configurado",
       "not_vestel": "Este dispositivo não é uma TV Vestel."
     }
+  },
+  "entity": {
+    "button": {
+      "up": {
+        "name": "Cima"
+      },
+      "down": {
+        "name": "Baixo"
+      },
+      "left": {
+        "name": "Esquerda"
+      },
+      "right": {
+        "name": "Direita"
+      },
+      "ok": {
+        "name": "OK"
+      },
+      "back": {
+        "name": "Voltar"
+      },
+      "exit": {
+        "name": "Sair"
+      },
+      "menu": {
+        "name": "Menu"
+      },
+      "quick_menu": {
+        "name": "Menu rápido"
+      },
+      "apps": {
+        "name": "Aplicações"
+      },
+      "info": {
+        "name": "Informação"
+      },
+      "epg": {
+        "name": "Guia de TV"
+      },
+      "text": {
+        "name": "Teletexto"
+      },
+      "subtitle": {
+        "name": "Legendas"
+      },
+      "channel_up": {
+        "name": "Canal seguinte"
+      },
+      "channel_down": {
+        "name": "Canal anterior"
+      },
+      "source": {
+        "name": "Fonte"
+      }
+    }
   }
 }

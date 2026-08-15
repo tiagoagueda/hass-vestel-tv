@@ -28,5 +28,60 @@
       "already_configured": "L'appareil est déjà configuré",
       "not_vestel": "Cet appareil n'est pas un téléviseur Vestel."
     }
+  },
+  "entity": {
+    "button": {
+      "up": {
+        "name": "Haut"
+      },
+      "down": {
+        "name": "Bas"
+      },
+      "left": {
+        "name": "Gauche"
+      },
+      "right": {
+        "name": "Droite"
+      },
+      "ok": {
+        "name": "OK"
+      },
+      "back": {
+        "name": "Retour"
+      },
+      "exit": {
+        "name": "Quitter"
+      },
+      "menu": {
+        "name": "Menu"
+      },
+      "quick_menu": {
+        "name": "Menu rapide"
+      },
+      "apps": {
+        "name": "Applications"
+      },
+      "info": {
+        "name": "Info"
+      },
+      "epg": {
+        "name": "Guide TV"
+      },
+      "text": {
+        "name": "Télétexte"
+      },
+      "subtitle": {
+        "name": "Sous-titres"
+      },
+      "channel_up": {
+        "name": "Chaîne suivante"
+      },
+      "channel_down": {
+        "name": "Chaîne précédente"
+      },
+      "source": {
+        "name": "Source"
+      }
+    }
   }
 }

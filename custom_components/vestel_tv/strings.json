@@ -28,5 +28,60 @@
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
       "not_vestel": "This device is not a Vestel TV."
     }
+  },
+  "entity": {
+    "button": {
+      "up": {
+        "name": "Up"
+      },
+      "down": {
+        "name": "Down"
+      },
+      "left": {
+        "name": "Left"
+      },
+      "right": {
+        "name": "Right"
+      },
+      "ok": {
+        "name": "OK"
+      },
+      "back": {
+        "name": "Back"
+      },
+      "exit": {
+        "name": "Exit"
+      },
+      "menu": {
+        "name": "Menu"
+      },
+      "quick_menu": {
+        "name": "Quick menu"
+      },
+      "apps": {
+        "name": "Apps"
+      },
+      "info": {
+        "name": "Info"
+      },
+      "epg": {
+        "name": "TV guide"
+      },
+      "text": {
+        "name": "Teletext"
+      },
+      "subtitle": {
+        "name": "Subtitles"
+      },
+      "channel_up": {
+        "name": "Channel up"
+      },
+      "channel_down": {
+        "name": "Channel down"
+      },
+      "source": {
+        "name": "Source"
+      }
+    }
   }
 }

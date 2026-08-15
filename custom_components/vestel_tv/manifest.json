@@ -15,5 +15,5 @@
     { "st": "urn:dial-multiscreen-org:service:dial:1" },
     { "deviceType": "urn:schemas-upnp-org:device:tvdevice:1" }
   ],
-  "version": "0.4.0"
+  "version": "0.5.0"
 }

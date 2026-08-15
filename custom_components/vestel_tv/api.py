@@ -74,6 +74,7 @@ class VestelDescription:
     app_url: str | None = None
     friendly_name: str | None = None
     model_name: str | None = None
+    brand: str | None = None
     tv_version: str | None = None
     software_version: str | None = None
     dial_version: str | None = None
@@ -135,6 +136,9 @@ def _parse_description(location: str, app_url: str | None, xml: str) -> VestelDe
         app_url=app_url,
         friendly_name=values.get("friendlyName"),
         model_name=values.get("modelName"),
+        # <locale><name> carries the retail brand the panel was sold under
+        # (ESSENTIELB, Toshiba, Finlux, ...), which is rarely "Vestel".
+        brand=values.get("name"),
         tv_version=values.get("tv_version"),
         software_version=values.get("software_version"),
         dial_version=values.get("dial_version"),

@@ -8,31 +8,40 @@
 [![Project Maintenance][maintenance-shield]][user_profile]
 [![Community Forum][forum-shield]][forum]
 
-Home Assistant custom integration for Vestel-built smart TVs, controlled locally over
-the TV's own "Virtual Remote" interface — no cloud, no vendor account, no bridge.
+Home Assistant custom integration for Vestel-built smart TVs, controlled locally over the
+TV's own remote interface — no cloud, no vendor account, no bridge.
 
 ![logo][vestelimg]
 
-The integration is **self-contained**: the `pyvesteltv` protocol logic is vendored into
+The integration is **self-contained**: the protocol lives in
 [`custom_components/vestel_tv/api.py`](custom_components/vestel_tv/api.py), so there is
 nothing extra to install from PyPI.
 
 > [!WARNING]
-> **v0.3.0 has been verified against exactly one TV** — a Vestel_MB211 (software
-> 3.33.21.0, sold as ESSENTIELB). Discovery, key codes and state all work there. Whether
-> older Vestel chassis speak the same protocol is untested — see [Status](#status).
+> **Verified against exactly one TV** — a Vestel_MB211 (software 3.33.21.0, sold as
+> ESSENTIELB). Discovery, state and key codes all work there. Whether older Vestel chassis
+> speak the same protocol is untested, and this version removed the legacy channels they
+> may rely on — see [Status](#status).
 
 ## Features
 
-| Platform       | Description                                                           |
-| -------------- | --------------------------------------------------------------------- |
-| `media_player` | Power on/off, volume step, mute toggle and source selection for a TV. |
+| Platform       | Description                                                                                            |
+| -------------- | ------------------------------------------------------------------------------------------------------ |
+| `media_player` | Power, volume step, mute, source, play/pause/stop, channel up/down, tuning a channel or opening a URL. |
+| `button`       | 17 remote keys — D-pad and OK, Back, Exit, Menu, Quick menu, Apps, Info, TV guide, Teletext, Subtitles |
 
-- **Local polling** — the TV's state (power, mute, volume, source, program) is read every
-  30 s over a plain TCP socket; commands go out immediately as key codes.
-- **Zero YAML** — the TV is added through a UI config flow; only its IP address is needed.
-- **Automatic endpoint discovery** — the HTTP remote endpoint is resolved via SSDP/DIAL,
-  so no port hunting is required.
+- **Local push** — the TV's state arrives over a WebSocket it keeps open, rather than
+  being polled; commands go out immediately as key codes.
+- **Automatic discovery** — switched-on TVs are found over SSDP and simply appear in
+  Home Assistant waiting to be confirmed. No IP address to type, no ports to hunt for.
+- **Zero YAML** — everything is set up through the UI.
+- **Rich device information** — model, retail brand, software and hardware version, and
+  MAC address, all read from the TV itself.
+- **Survives a new DHCP lease** — entries are keyed by the TV's MAC, not its address.
+
+Two limits worth knowing up front. The TV exposes no readable volume *level*, only
+relative steps, so `volume_level` stays unknown rather than showing a made-up number. And
+power-on only works if the TV is still on the network — see [Troubleshooting](#troubleshooting).
 
 ## Supported devices
 
@@ -100,11 +109,11 @@ answers and is actually a Vestel before creating the entry.
 
 Everything else uses the defaults baked into the stock Vestel protocol — commands on the
 DIAL port 56789, state on WebSocket 7681, SSDP/DIAL discovery on 1900. Each TV becomes one
-device with a single `media_player` entity.
+device with a `media_player` entity and 17 remote-key `button` entities.
 
 ## Protocol notes
 
-The TV exposes three concurrent interfaces:
+The TV exposes two concurrent interfaces:
 
 | Channel                       | Port         | Purpose                                       |
 | ----------------------------- | ------------ | --------------------------------------------- |
@@ -134,9 +143,15 @@ Two consequences worth knowing before you file a bug:
 
 ## Status
 
-**v0.3.0 — verified against one TV.** On a Vestel_MB211 (software 3.33.21.0, ESSENTIELB),
+**v0.5.0 — verified against one TV.** On a Vestel_MB211 (software 3.33.21.0, ESSENTIELB),
 these are confirmed working on real hardware: SSDP discovery, the WebSocket state channel,
-the parsed channel list, and key codes — volume up/down were observed changing the TV.
+the parsed channel list, key codes — volume up/down were observed changing the TV — and
+setting the integration up end to end in Home Assistant.
+
+Key codes 1012/1013/1016/1017 and the digits are confirmed on that TV, and 1010 (back) and
+1037 (exit) were captured from Vestel's own app. The remaining button codes come from
+[node-red-contrib-vestel-tv][nodered] and agree with those, but are **unverified here** —
+if a button does nothing on your set, that is the likely reason.
 
 Confirmed *not* available on that firmware, and so unsupported here: reading the current
 volume level or mute state. The protocol exposes only relative volume steps, so
@@ -224,6 +239,7 @@ MIT — see [LICENSE](LICENSE).
 [hacs-repo]: https://my.home-assistant.io/redirect/hacs_repository/?owner=tiagoagueda&repository=hass-vestel-tv&category=integration
 [hacs-repo-shield]: https://my.home-assistant.io/badges/hacs_repository.svg
 [issues]: https://github.com/tiagoagueda/hass-vestel-tv/issues
+[nodered]: https://github.com/hyttysmyrkky/node-red-contrib-vestel-tv
 [license-shield]: https://img.shields.io/github/license/tiagoagueda/hass-vestel-tv.svg?style=for-the-badge
 [maintenance-shield]: https://img.shields.io/badge/maintainer-%40tiagoagueda-blue.svg?style=for-the-badge
 [releases-shield]: https://img.shields.io/github/release/tiagoagueda/hass-vestel-tv.svg?style=for-the-badge

@@ -2,20 +2,32 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-
 from homeassistant.helpers.device_registry import format_mac
 
-from .api import VestelTV, async_probe_description
+from .api import VestelDescription, VestelTV, async_probe_description
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.MEDIA_PLAYER]
+PLATFORMS: list[Platform] = [Platform.MEDIA_PLAYER, Platform.BUTTON]
+
+
+@dataclass
+class VestelRuntime:
+    """What the platforms need: the client, plus the TV's description.
+
+    The description is read once at setup so the device registry can be
+    populated immediately, rather than waiting for an SSDP round to land.
+    """
+
+    tv: VestelTV
+    description: VestelDescription | None
 
 
 async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -49,10 +61,19 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Vestel TV from a config entry."""
     session = async_get_clientsession(hass)
-    tv = VestelTV(host=entry.data[CONF_HOST], session=session)
+    host = entry.data[CONF_HOST]
+    tv = VestelTV(host=host, session=session)
     await tv.async_start()
 
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = tv
+    # Best-effort: a TV that is off cannot describe itself, and that must not
+    # block setup. The device registry keeps whatever it learned last time.
+    description = await async_probe_description(session, host)
+    if description is None:
+        _LOGGER.debug("No device description from %s at setup; TV may be off", host)
+
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = VestelRuntime(
+        tv=tv, description=description
+    )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
@@ -62,6 +83,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     unloaded = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unloaded:
-        tv: VestelTV = hass.data[DOMAIN].pop(entry.entry_id)
-        await tv.async_stop()
+        runtime: VestelRuntime = hass.data[DOMAIN].pop(entry.entry_id)
+        await runtime.tv.async_stop()
     return unloaded

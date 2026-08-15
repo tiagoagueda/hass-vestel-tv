@@ -10,6 +10,47 @@ that is what HACS reads to offer an update.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-15
+
+### Added
+
+- **17 remote-key buttons**, as their own `button` entities — D-pad and OK,
+  Back, Exit, Menu, Quick menu, Apps, Info, TV guide, Teletext, Subtitles,
+  Channel up/down and Source. They can be dropped on a dashboard or called from
+  an automation without knowing any key codes, and each exposes its `key_code`
+  as an attribute. Names are translated in English, French and Portuguese.
+- **A far fuller device entry.** The device page now shows the TV's model
+  (retail brand plus chassis, e.g. `ESSENTIELB Vestel_MB211`), software version,
+  hardware version and **MAC address** — the last registered as a network
+  connection, so Home Assistant can tie the TV to its DHCP and router entries.
+  All of it is read from the TV's own `dd.xml`.
+- **More on the media player**: play, pause, stop, and next/previous track
+  (mapped to channel up/down). `media_player.play_media` now accepts a
+  `channel` (typed on the number keys, since the protocol has no direct tune)
+  or a `url` (opened in the TV's browser, the same call the official app uses to
+  launch portal apps).
+- `media_title` reports what the TV says it is showing, and new state attributes
+  cover the channel list and count, brand, model, software/TV version, MAC,
+  DIAL version, and whether the state WebSocket is currently connected.
+- A much larger key-code table in `const.py` — navigation, colour keys,
+  transport, teletext, favourites and app keys.
+
+### Changed
+
+- The media player is now declared with device class `tv`, so Home Assistant
+  gives it the TV-shaped card and controls.
+- Entities share a common base (`entity.py`) so the media player and every
+  button report identical device information.
+
+### Notes
+
+Key codes 1012/1013/1016/1017 and the digits are confirmed against a real TV,
+and 1010 (back) and 1037 (exit) were observed in a capture of Vestel's own app.
+The rest come from
+[node-red-contrib-vestel-tv](https://github.com/hyttysmyrkky/node-red-contrib-vestel-tv)
+and agree with those two, but are otherwise unverified here — if a button does
+nothing on your set, that is the likely reason and worth an issue.
+
 ## [0.4.0] - 2026-08-15
 
 ### Added
@@ -137,7 +178,8 @@ is forked from [T3m3z/HA-Vestel-Component](https://github.com/T3m3z/HA-Vestel-Co
 and [T3m3z/pyvesteltv](https://github.com/T3m3z/pyvesteltv), which carry the per-commit
 history of the original component and protocol library.
 
-[unreleased]: https://github.com/tiagoagueda/hass-vestel-tv/compare/v0.4.0...HEAD
+[unreleased]: https://github.com/tiagoagueda/hass-vestel-tv/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/tiagoagueda/hass-vestel-tv/releases/tag/v0.5.0
 [0.4.0]: https://github.com/tiagoagueda/hass-vestel-tv/releases/tag/v0.4.0
 [0.3.0]: https://github.com/tiagoagueda/hass-vestel-tv/releases/tag/v0.3.0
 [0.2.0]: https://github.com/tiagoagueda/hass-vestel-tv/releases/tag/v0.2.0
