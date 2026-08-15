@@ -3,7 +3,11 @@ from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST
-from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, DeviceInfo
+from homeassistant.helpers.device_registry import (
+    CONNECTION_NETWORK_MAC,
+    DeviceInfo,
+    format_mac,
+)
 from homeassistant.helpers.entity import Entity
 
 from .api import VestelDescription, VestelTV
@@ -42,10 +46,17 @@ def build_device_info(
         info["sw_version"] = description.software_version
     if description.tv_version:
         info["hw_version"] = description.tv_version
-    if description.mac:
-        # Surfaces the MAC on the device page and lets Home Assistant tie the
-        # TV to its DHCP/router entries.
-        info["connections"] = {(CONNECTION_NETWORK_MAC, description.mac)}
+    # Home Assistant merges devices across integrations when *any* connection
+    # or identifier matches, so report every MAC the TV is known by. A set with
+    # both wired and wireless interfaces answers on one and advertises the
+    # other, and registering only one silently prevents grouping with whichever
+    # integration -- router, DHCP, device tracker -- knows it by the other.
+    # format_mac is applied here because the registry rejects a stored
+    # connection whose MAC is not already normalised.
+    if macs := description.macs:
+        info["connections"] = {
+            (CONNECTION_NETWORK_MAC, format_mac(mac)) for mac in macs
+        }
 
     return info
 

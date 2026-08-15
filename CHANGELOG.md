@@ -21,9 +21,15 @@ that is what HACS reads to offer an update.
   as an attribute. Names are translated in English, French and Portuguese.
 - **A far fuller device entry.** The device page now shows the TV's model
   (retail brand plus chassis, e.g. `ESSENTIELB Vestel_MB211`), software version,
-  hardware version and **MAC address** — the last registered as a network
-  connection, so Home Assistant can tie the TV to its DHCP and router entries.
-  All of it is read from the TV's own `dd.xml`.
+  hardware version and **MAC addresses**. All of it is read from the TV's own
+  `dd.xml`.
+- **Grouping with other integrations.** Home Assistant merges devices across
+  integrations when any connection matches, so **every** MAC the TV is known by
+  is registered, not just one. These sets report one MAC in `<mac>` and a
+  different one appended to `friendlyName`, and it is usually the latter that is
+  actually on the network — registering only the former means the TV never
+  groups with whichever integration (router, DHCP, device tracker) knows it by
+  its other address.
 - **More on the media player**: play, pause, stop, and next/previous track
   (mapped to channel up/down). `media_player.play_media` now accepts a
   `channel` (typed on the number keys, since the protocol has no direct tune)

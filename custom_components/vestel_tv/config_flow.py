@@ -45,8 +45,11 @@ class VestelTVConfigFlow(ConfigFlow, domain=DOMAIN):
         the host keeps sets that do not publish a MAC working, at the cost of
         reappearing as a new device if their address changes.
         """
-        if description.mac:
-            return format_mac(description.mac)
+        # Deliberately prefers <mac> over the friendlyName MAC: it is the more
+        # stable of the two, and entries created before both were parsed used
+        # it. Changing the preference would orphan those entries.
+        if mac := (description.mac or description.friendly_mac):
+            return format_mac(mac)
         return host
 
     async def async_step_user(

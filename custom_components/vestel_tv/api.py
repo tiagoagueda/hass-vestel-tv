@@ -79,7 +79,13 @@ class VestelDescription:
     software_version: str | None = None
     dial_version: str | None = None
     verification_key: str | None = None
+    #: The MAC from ``<mac>``. On sets with both a wired and a wireless
+    #: interface this is often *not* the one currently on the network.
     mac: str | None = None
+    #: The MAC Vestel appends to ``friendlyName``, which is the interface the
+    #: TV is actually reachable on -- and so the one a router, DHCP or
+    #: device-tracker integration will report for it.
+    friendly_mac: str | None = None
 
     @property
     def is_vestel(self) -> bool:
@@ -97,21 +103,45 @@ class VestelDescription:
 
     @property
     def name(self) -> str:
-        """A human-friendly name for the config flow.
+        """A human-friendly name for the config flow."""
+        label, _ = _split_friendly_name(self.friendly_name)
+        return label or self.model_name or DEFAULT_NAME
 
-        Vestel sets report a ``friendlyName`` of ``BRAND_aa:bb:cc:dd:ee:ff``,
-        which is no one's idea of a device name, so drop the MAC suffix.
+    @property
+    def macs(self) -> tuple[str, ...]:
+        """Every MAC this TV is known by, most-reachable first.
+
+        A set with both wired and wireless interfaces reports one MAC in
+        ``<mac>`` and a different one in ``friendlyName``, and only the latter
+        is usually the interface currently on the network. Home Assistant
+        merges devices across integrations when *any* connection matches, so
+        report both -- otherwise this TV never groups with the router or
+        DHCP integration that knows it by its other address.
         """
-        friendly = (self.friendly_name or "").strip()
-        brand, separator, suffix = friendly.rpartition("_")
-        if separator and suffix.count(":") == 5:
-            friendly = brand
-        return friendly or self.model_name or DEFAULT_NAME
+        seen: list[str] = []
+        for mac in (self.friendly_mac, self.mac):
+            if mac and mac.lower() not in {existing.lower() for existing in seen}:
+                seen.append(mac)
+        return tuple(seen)
 
 
 def _local_name(tag: str) -> str:
     """Strip any XML namespace from *tag*."""
     return tag.rpartition("}")[2]
+
+
+def _split_friendly_name(friendly_name: str | None) -> tuple[str, str | None]:
+    """Split ``BRAND_aa:bb:cc:dd:ee:ff`` into its label and MAC.
+
+    Vestel sets append the MAC of the interface they are reachable on to
+    ``friendlyName``. That is no one's idea of a device name, but it is a
+    useful address, so return both halves.
+    """
+    friendly = (friendly_name or "").strip()
+    label, separator, suffix = friendly.rpartition("_")
+    if separator and suffix.count(":") == 5 and len(suffix) == 17:
+        return label, suffix
+    return friendly, None
 
 
 def _parse_description(location: str, app_url: str | None, xml: str) -> VestelDescription:
@@ -131,10 +161,12 @@ def _parse_description(location: str, app_url: str | None, xml: str) -> VestelDe
         text = (element.text or "").strip()
         if text:
             values.setdefault(_local_name(element.tag), text)
+    _, friendly_mac = _split_friendly_name(values.get("friendlyName"))
     return VestelDescription(
         location=location,
         app_url=app_url,
         friendly_name=values.get("friendlyName"),
+        friendly_mac=friendly_mac,
         model_name=values.get("modelName"),
         # <locale><name> carries the retail brand the panel was sold under
         # (ESSENTIELB, Toshiba, Finlux, ...), which is rarely "Vestel".

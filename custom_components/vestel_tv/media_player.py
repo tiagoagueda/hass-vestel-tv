@@ -135,6 +135,8 @@ class VestelTVMediaPlayer(VestelEntity, MediaPlayerEntity):
                 attributes["tv_version"] = description.tv_version
             if description.mac:
                 attributes["mac_address"] = description.mac
+            if len(description.macs) > 1:
+                attributes["mac_addresses"] = list(description.macs)
             if description.dial_version:
                 attributes["dial_version"] = description.dial_version
         return attributes
