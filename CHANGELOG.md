@@ -10,6 +10,24 @@ that is what HACS reads to offer an update.
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-11-20
+
+### Fixed
+
+- **Ready for Home Assistant 2026.11's `DeviceInfo` dataclass.** The device
+  info is now built in one keyword-argument call. Before, it was built by
+  assigning keys after construction, which 2026.11 only accepts through a
+  compatibility layer that is marked for removal. Still compatible back to
+  2024.4.
+
+### Changed
+
+- The README's install steps now cover the built-in **Marketplace**, which
+  replaces HACS from Home Assistant 2026.11. The repository layout and
+  `hacs.json` are unchanged; the Marketplace reads them as HACS did.
+- `CLAUDE.md` is now `AGENTS.md`. A one-line `CLAUDE.md` imports it, so
+  Claude Code still loads it.
+
 ## [0.6.0] - 2026-08-15
 
 ### Added

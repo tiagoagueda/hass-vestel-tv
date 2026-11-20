@@ -78,11 +78,15 @@ Medion** and **Finlux**. The upstream project was developed against a Procaster 
 
 ## Installation
 
-### HACS (recommended)
+### Marketplace / HACS (recommended)
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.][hacs-repo-shield]][hacs-repo]
 
-1. In Home Assistant, open **HACS → ⋮ (top right) → Custom repositories**.
+Since Home Assistant 2026.11, HACS is built in as the **Marketplace** (Settings → Marketplace),
+and a HACS install migrates to it on first start. On older versions, use HACS itself. The steps
+are the same either way:
+
+1. Open the Marketplace (or HACS) and choose **⋮ (top right) → Custom repositories**.
 2. Add `https://github.com/tiagoagueda/hass-vestel-tv` with type **Integration**.
 3. Search for **Vestel TV**, download it, and restart Home Assistant.
 
